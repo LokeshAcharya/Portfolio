@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #090c10;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --bg4: #21262d;
+    --border: rgba(48,54,61,0.8);
+    --accent: #1f6feb;
+    --accent2: #3fb950;
+    --accent3: #58a6ff;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #484f58;
+    --danger: #f85149;
+    --warn: #d29922;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(9,12,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 0;
+    height: 52px;
+  }
+  .nav-brand {
+    font-family: var(--display);
+    font-size: 14px; font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.5px;
+    margin-right: auto;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-brand span { color: var(--text2); font-weight: 400; font-size: 11px; }
+  .nav-links { display: flex; gap: 0; }
+  .nav-link {
+    padding: 6px 14px;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.15s;
+    border-radius: 4px;
+    border: none; background: none;
+  }
+  .nav-link:hover { color: var(--text); }
+  .nav-link.active { color: var(--accent3); }
+
+  /* STATUS DOT */
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent2);
+    animation: pulse 2s infinite;
+    display: inline-block;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity:1; }
+    50% { opacity:0.3; }
+  }
+
+  /* PAGES */
+  .page { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* HOME */
+  .hero {
+    padding: 4rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+  .hero-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800; line-height: 1.1;
+    color: var(--text); margin-bottom: 0.75rem;
+    letter-spacing: -1px;
+  }
+  .hero-name .accent { color: var(--accent3); }
+  .hero-title {
+    font-size: 13px; color: var(--text2); margin-bottom: 0.5rem;
+    font-family: var(--mono);
+  }
+  .hero-sub {
+    font-size: 11px; color: var(--text3); margin-bottom: 2.5rem;
+  }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 3rem; }
+  .btn {
+    padding: 8px 20px; border-radius: 4px; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px;
+    text-transform: uppercase; transition: all 0.15s; border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent3); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+  }
+  .btn-secondary:hover { background: rgba(63,185,80,0.1); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text3); }
+
+  /* LOG FEED */
+  .log-feed {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    height: 140px; overflow: hidden;
+    position: relative;
+    margin-bottom: 3rem;
+  }
+  .log-feed-header {
+    font-size: 10px; color: var(--text3); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .log-entry {
+    font-size: 10px; line-height: 1.8; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .log-entry.info { color: var(--accent3); }
+  .log-entry.warn { color: var(--warn); }
+  .log-entry.alert { color: var(--danger); }
+  .log-entry.ok { color: var(--accent2); }
+  .log-entry.dim { color: var(--text3); }
+
+  /* STATS STRIP */
+  .stats-strip {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  .stat-cell {
+    background: var(--bg2); padding: 1.25rem 1rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--display); font-size: 28px; font-weight: 800;
+    color: var(--accent3); display: block; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .section-title {
+    font-family: var(--display); font-size: 16px; font-weight: 700;
+    color: var(--text);
+  }
+  .section-tag {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent2); padding: 2px 8px;
+    border: 1px solid rgba(63,185,80,0.3);
+    border-radius: 3px;
+  }
+  .section-line { flex:1; height:1px; background: var(--border); }
+
+  /* PROJECT CARDS */
+  .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .project-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.5rem; cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height: 2px;
+    background: var(--accent); transition: background 0.2s;
+  }
+  .project-card:hover { border-color: rgba(88,166,255,0.4); transform: translateY(-2px); }
+  .project-card:hover::before { background: var(--accent2); }
+  .project-card-tag {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 8px; display: block;
+  }
+  .project-card-title {
+    font-family: var(--display); font-size: 17px; font-weight: 700;
+    color: var(--text); margin-bottom: 8px; line-height: 1.2;
+  }
+  .project-card-desc { font-size: 11px; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; }
+  .project-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 9px; padding: 2px 8px;
+    background: var(--bg4); color: var(--text2);
+    border-radius: 3px; border: 1px solid var(--border);
+    letter-spacing: 0.5px;
+  }
+
+  /* SKILLS PAGE */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 2rem; }
+  .skill-group {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem;
+  }
+  .skill-group-title {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent3);
+    margin-bottom: 1rem;
+  }
+  .skill-row { margin-bottom: 10px; }
+  .skill-name { font-size: 11px; color: var(--text2); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .skill-bar { height: 2px; background: var(--bg4); border-radius: 1px; overflow: hidden; }
+  .skill-fill { height: 100%; border-radius: 1px; transition: width 1s ease; }
+  .skill-fill.blue { background: var(--accent3); }
+  .skill-fill.green { background: var(--accent2); }
+  .skill-fill.amber { background: var(--warn); }
+
+  /* CERTS */
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .cert-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .cert-icon {
+    width: 40px; height: 40px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .cert-icon.thm { background: rgba(31,111,235,0.15); color: var(--accent3); }
+  .cert-icon.cisco { background: rgba(63,185,80,0.1); color: var(--accent2); }
+  .cert-title { font-size: 12px; color: var(--text); margin-bottom: 3px; font-weight: 500; }
+  .cert-issuer { font-size: 10px; color: var(--text3); }
+  .cert-badge {
+    font-size: 9px; padding: 1px 7px; border-radius: 3px; margin-top: 6px; display: inline-block;
+    background: rgba(63,185,80,0.1); color: var(--accent2); border: 1px solid rgba(63,185,80,0.2);
+  }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .about-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+  .about-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin-bottom: 0.75rem; }
+  .about-text { font-size: 12px; color: var(--text2); line-height: 2; }
+  .about-text strong { color: var(--text); font-weight: 500; }
+
+  /* WRITEUPS */
+  .writeup-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem;
+    margin-bottom: 12px; cursor: pointer; transition: all 0.15s;
+    display: flex; gap: 1.5rem; align-items: flex-start;
+  }
+  .writeup-card:hover { border-color: rgba(88,166,255,0.3); }
+  .writeup-num {
+    font-family: var(--display); font-size: 32px; font-weight: 800;
+    color: var(--bg4); line-height: 1; flex-shrink: 0; width: 36px;
+  }
+  .writeup-title { font-size: 14px; color: var(--text); margin-bottom: 4px; font-weight: 500; }
+  .writeup-meta { font-size: 10px; color: var(--text3); margin-bottom: 6px; }
+  .writeup-excerpt { font-size: 11px; color: var(--text2); line-height: 1.7; }
+
+  /* CONTACT */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  .contact-form { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); display: block; margin-bottom: 6px; }
+  .form-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+    padding: 8px 12px; color: var(--text); font-family: var(--mono); font-size: 12px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--accent3); }
+  textarea.form-input { min-height: 90px; resize: vertical; }
+  .contact-links { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+  .contact-link-row {
+    display: flex; align-items: center; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: color 0.15s; text-decoration: none; color: inherit;
+  }
+  .contact-link-row:last-child { border-bottom: none; }
+  .contact-link-row:hover .clink-label { color: var(--accent3); }
+  .clink-icon { width: 32px; height: 32px; background: var(--bg4); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .clink-label { font-size: 12px; color: var(--text2); }
+  .clink-val { font-size: 11px; color: var(--text3); margin-left: auto; }
+
+  /* PROJECT DETAIL */
+  .detail-header { padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .detail-back {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text3);
+    cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 1.5rem;
+    transition: color 0.15s; background: none; border: none;
+  }
+  .detail-back:hover { color: var(--accent3); }
+  .detail-title { font-family: var(--display); font-size: 32px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .detail-desc { font-size: 12px; color: var(--text2); line-height: 1.8; max-width: 600px; }
+  .detail-meta-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+  .detail-meta { font-size: 10px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+  .detail-meta strong { color: var(--accent3); }
+
+  .code-block {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 16px; margin: 1rem 0; overflow-x: auto;
+  }
+  .code-block-header {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3);
+    margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .code-dot { width: 8px; height: 8px; border-radius: 50%; }
+  pre { font-size: 11px; color: var(--accent2); line-height: 1.8; white-space: pre-wrap; }
+  .code-comment { color: var(--text3); }
+  .code-keyword { color: var(--accent3); }
+  .code-string { color: var(--warn); }
+
+  .arch-diagram {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.5rem; margin: 1rem 0;
+  }
+  .arch-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .arch-node {
+    background: var(--bg4); border: 1px solid var(--border); border-radius: 4px;
+    padding: 6px 12px; font-size: 10px; color: var(--text2);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .arch-node.highlight { border-color: rgba(31,111,235,0.5); color: var(--accent3); }
+  .arch-node.success { border-color: rgba(63,185,80,0.4); color: var(--accent2); }
+  .arch-arrow { font-size: 14px; color: var(--text3); }
+
+  .info-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin: 1rem 0; }
+  .info-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+  .info-card-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+  .info-card-val { font-size: 12px; color: var(--text); }
+
+  .alert-feed { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .alert-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; }
+  .alert-row:last-child { border-bottom: none; }
+  .alert-sev { font-size: 8px; letter-spacing: 1px; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
+  .sev-high { background: rgba(248,81,73,0.15); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+  .sev-med { background: rgba(210,153,34,0.15); color: var(--warn); border: 1px solid rgba(210,153,34,0.3); }
+  .sev-low { background: rgba(63,185,80,0.1); color: var(--accent2); border: 1px solid rgba(63,185,80,0.2); }
+  .alert-rule { color: var(--accent3); flex: 1; }
+  .alert-time { color: var(--text3); flex-shrink: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .about-grid, .contact-grid { grid-template-columns: 1fr; }
+    .hero-name { font-size: 32px; }
+    nav { padding: 0 1rem; }
+    .nav-link { padding: 6px 8px; font-size: 10px; }
+    .page { padding: 1.25rem; }
+  }
+</style>
+
+<nav>
+  <div class="nav-brand">
+    <span class="status-dot"></span>
+    LOKESH.ACHARYA
+    <span>// SOC ANALYST</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home')">Home</button>
+    <button class="nav-link" onclick="showPage('projects')">Projects</button>
+    <button class="nav-link" onclick="showPage('skills')">Skills</button>
+    <button class="nav-link" onclick="showPage('writeups')">Writeups</button>
+    <button class="nav-link" onclick="showPage('certs')">Certs</button>
+    <button class="nav-link" onclick="showPage('about')">About</button>
+    <button class="nav-link" onclick="showPage('contact')">Contact</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-label"><span class="status-dot"></span> ANALYST ONLINE — THREAT DETECTION ACTIVE</div>
+    <div class="hero-name">Lokesh<br><span class="accent">Acharya</span></div>
+    <div class="hero-title">Cybersecurity Student · Blue Team Enthusiast</div>
+    <div class="hero-sub">Focused on Threat Detection · SIEM Monitoring · Incident Response</div>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="showPage('projects')">View Projects</button>
+      <button class="btn btn-secondary" onclick="showProjectDetail('wazuh')">SOC Lab →</button>
+      <button class="btn btn-ghost" onclick="showPage('writeups')">Read Writeups</button>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-cell"><span class="stat-num">110+</span><span class="stat-label">THM Rooms</span></div>
+    <div class="stat-cell"><span class="stat-num">2</span><span class="stat-label">Projects Live</span></div>
+    <div class="stat-cell"><span class="stat-num">3</span><span class="stat-label">Certifications</span></div>
+    <div class="stat-cell"><span class="stat-num">24/7</span><span class="stat-label">Learning Mode</span></div>
+  </div>
+
+  <div class="log-feed">
+    <div class="log-feed-header"><span class="status-dot"></span> LIVE LOG STREAM — SIMULATED</div>
+    <div id="log-container"></div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Featured Projects</div>
+    <div class="section-tag">BLUE TEAM</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="project-grid">
+    <div class="project-card" onclick="showProjectDetail('honeypot')">
+      <span class="project-card-tag">INTRUSION DETECTION</span>
+      <div class="project-card-title">Honeypot Alert System</div>
+      <div class="project-card-desc">Real-time attack detection and alerting system with CLI and GUI interfaces. Logs attacker IPs, attack vectors, and generates instant alerts.</div>
+      <div class="project-tags">
+        <span class="tag">Python</span>
+        <span class="tag">Scapy</span>
+        <span class="tag">Logging</span>
+        <span class="tag">GUI/CLI</span>
+      </div>
+    </div>
+    <div class="project-card" onclick="showProjectDetail('wazuh')">
+      <span class="project-card-tag">SIEM · DETECTION ENG.</span>
+      <div class="project-card-title">Wazuh Home SOC Lab</div>
+      <div class="project-card-desc">3-VM segmented lab with Wazuh SIEM. Custom detection rules mapped to MITRE ATT&CK. ModSecurity WAF integration for full visibility.</div>
+      <div class="project-tags">
+        <span class="tag">Wazuh</span>
+        <span class="tag">MITRE ATT&CK</span>
+        <span class="tag">ModSecurity</span>
+        <span class="tag">ELK</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div id="page-projects" class="page">
+  <div style="padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem;">
+    <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:12px;">PROJECTS // CASE STUDIES</div>
+    <div style="font-family:var(--display); font-size:32px; font-weight:800; color:var(--text); margin-bottom:8px;">Technical Work</div>
+    <div style="font-size:12px; color:var(--text2); max-width:500px; line-height:1.8;">Hands-on blue team projects demonstrating real-world detection engineering, SIEM operations, and security monitoring.</div>
+  </div>
+  <div class="project-grid">
+    <div class="project-card" onclick="showProjectDetail('honeypot')">
+      <span class="project-card-tag">INTRUSION DETECTION · PYTHON</span>
+      <div class="project-card-title">Honeypot Alert System</div>
+      <div class="project-card-desc">A fully functional honeypot with real-time alerting, packet capture, and dual-interface (CLI + GUI) design. Detects port scans, brute force attempts, and connection anomalies.</div>
+      <div class="project-tags">
+        <span class="tag">Python</span><span class="tag">Scapy</span><span class="tag">Socket</span>
+        <span class="tag">Tkinter GUI</span><span class="tag">Logging</span>
+      </div>
+      <div style="margin-top:1rem; font-size:10px; color:var(--accent3);">VIEW CASE STUDY →</div>
+    </div>
+    <div class="project-card" onclick="showProjectDetail('wazuh')">
+      <span class="project-card-tag">SIEM · DETECTION ENGINEERING</span>
+      <div class="project-card-title">Wazuh Home SOC Lab</div>
+      <div class="project-card-desc">End-to-end SOC simulation with Wazuh SIEM, custom detection rules mapped to MITRE ATT&CK techniques, ModSecurity WAF, and a 3-VM network segmentation architecture.</div>
+      <div class="project-tags">
+        <span class="tag">Wazuh</span><span class="tag">MITRE ATT&CK</span><span class="tag">Apache</span>
+        <span class="tag">ModSecurity</span><span class="tag">VirtualBox</span>
+      </div>
+      <div style="margin-top:1rem; font-size:10px; color:var(--accent3);">VIEW CASE STUDY →</div>
+    </div>
+    <div class="project-card" style="opacity:0.5; cursor:default;">
+      <span class="project-card-tag">ACTIVE DIRECTORY · IN PROGRESS</span>
+      <div class="project-card-title">AD Attack & Detect Lab</div>
+      <div class="project-card-desc">4-phase Active Directory lab: Domain setup → Attack with Impacket/BloodHound → Detect via Wazuh Windows Event IDs → Document methodology.</div>
+      <div class="project-tags">
+        <span class="tag">Impacket</span><span class="tag">BloodHound</span>
+        <span class="tag">Windows Server</span><span class="tag">Event IDs</span>
+      </div>
+      <div style="margin-top:1rem; font-size:10px; color:var(--text3);">COMING SOON</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT DETAIL (honeypot) -->
+<div id="page-detail-honeypot" class="page">
+  <div class="detail-header">
+    <button class="detail-back" onclick="showPage('projects')">← BACK TO PROJECTS</button>
+    <div class="detail-title">Honeypot Alert System</div>
+    <div class="detail-desc">A real-time attack detection and alerting honeypot built in Python. Monitors open ports, logs connection attempts, and triggers alerts via CLI and GUI interfaces.</div>
+    <div class="detail-meta-row">
+      <div class="detail-meta"><strong>TYPE</strong>&nbsp; Intrusion Detection</div>
+      <div class="detail-meta"><strong>LANG</strong>&nbsp; Python 3</div>
+      <div class="detail-meta"><strong>REPO</strong>&nbsp; github.com/LokeshAcharya/Honeypot_alert_system</div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-title">Architecture</div><div class="section-line"></div></div>
+  <div class="arch-diagram">
+    <div class="arch-row">
+      <div class="arch-node">Internet / Attacker</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node highlight">Honeypot Listener<br><span style="color:var(--text3);font-size:9px">ports 22,80,443,3306</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">Packet Capture<br><span style="color:var(--text3);font-size:9px">Scapy</span></div>
+    </div>
+    <div class="arch-row" style="margin-left:2rem;">
+      <div class="arch-arrow" style="transform:rotate(90deg)">→</div>
+    </div>
+    <div class="arch-row" style="margin-left:1rem;">
+      <div class="arch-node">Logger<br><span style="color:var(--text3);font-size:9px">IP, port, time, payload</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node success">Alert Engine</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node success">CLI + GUI Output</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:2rem;"><div class="section-title">Key Features</div><div class="section-line"></div></div>
+  <div class="info-row">
+    <div class="info-card"><div class="info-card-label">Real-time Alerting</div><div class="info-card-val">Instant notifications on connection attempts with source IP, port, and timestamp</div></div>
+    <div class="info-card"><div class="info-card-label">Dual Interface</div><div class="info-card-val">CLI mode for headless deployment, Tkinter GUI for visual monitoring</div></div>
+    <div class="info-card"><div class="info-card-label">Structured Logging</div><div class="info-card-val">All events written to log files with ISO timestamps for later analysis</div></div>
+    <div class="info-card"><div class="info-card-label">Multi-Port Listener</div><div class="info-card-val">Simulates multiple services (SSH, HTTP, MySQL) to maximize attacker engagement</div></div>
+  </div>
+
+  <div class="section-header" style="margin-top:2rem;"><div class="section-title">Code Snippet</div><div class="section-line"></div></div>
+  <div class="code-block">
+    <div class="code-block-header"><span class="code-dot" style="background:#ff5f56"></span><span class="code-dot" style="background:#ffbd2e"></span><span class="code-dot" style="background:#27c93f"></span>&nbsp; honeypot_core.py</div>
+    <pre><span class="code-keyword">import</span> socket, threading, logging
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime
+
+<span class="code-comment"># Configure structured logging</span>
+logging.basicConfig(
+    filename=<span class="code-string">'honeypot.log'</span>,
+    format=<span class="code-string">'%(asctime)s | %(levelname)s | %(message)s'</span>
+)
+
+<span class="code-keyword">def</span> handle_connection(conn, addr, port):
+    timestamp = datetime.utcnow().isoformat()
+    msg = <span class="code-string">f"[{timestamp}] ALERT: Connection from {addr[0]}:{addr[1]} on port {port}"</span>
+    logging.warning(msg)
+    alert_engine.trigger(addr[0], port, timestamp)
+    conn.close()
+
+<span class="code-keyword">def</span> listen_port(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((<span class="code-string">''</span>, port))
+    s.listen(5)
+    <span class="code-keyword">while</span> True:
+        conn, addr = s.accept()
+        threading.Thread(target=handle_connection, args=(conn, addr, port)).start()</pre>
+  </div>
+
+  <div class="section-header" style="margin-top:2rem;"><div class="section-title">Lessons Learned</div><div class="section-line"></div></div>
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.25rem; font-size:12px; color:var(--text2); line-height:2;">
+    Deploying a real honeypot taught me the value of <strong style="color:var(--text)">structured log formats</strong> — unstructured logs become useless during incident review. Threading in Python required careful attention to <strong style="color:var(--text)">race conditions</strong> in shared log state. The GUI/CLI split reinforced the principle of <strong style="color:var(--text)">separation of concerns</strong>: presentation layer must not block the capture loop.
+  </div>
+  <div style="margin-top:1.5rem; display:flex; gap:12px;">
+    <a href="https://github.com/LokeshAcharya/Honeypot_alert_system" target="_blank" rel="noopener noreferrer"><button class="btn btn-primary">View on GitHub</button></a>
+  </div>
+</div>
+
+<!-- PROJECT DETAIL (wazuh) -->
+<div id="page-detail-wazuh" class="page">
+  <div class="detail-header">
+    <button class="detail-back" onclick="showPage('projects')">← BACK TO PROJECTS</button>
+    <div class="detail-title">Wazuh Home SOC Lab</div>
+    <div class="detail-desc">A 3-VM segmented home lab running Wazuh SIEM with custom detection rules mapped to MITRE ATT&CK. Includes ModSecurity WAF deployment fixing an Apache POST body logging gap.</div>
+    <div class="detail-meta-row">
+      <div class="detail-meta"><strong>TYPE</strong>&nbsp; SIEM / Detection Engineering</div>
+      <div class="detail-meta"><strong>PLATFORM</strong>&nbsp; VirtualBox + Kali/Ubuntu</div>
+      <div class="detail-meta"><strong>BLOG</strong>&nbsp; medium.com/@lokeshacharya</div>
+    </div>
+  </div>
+
+  <div class="section-header"><div class="section-title">Lab Architecture</div><div class="section-line"></div></div>
+  <div class="arch-diagram">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:center;">
+      <div style="text-align:center;">
+        <div class="arch-node" style="justify-content:center; margin-bottom:6px;">VM-1: Wazuh Manager</div>
+        <div style="font-size:9px; color:var(--text3)">Ubuntu 22.04<br>SIEM + Dashboard</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="arch-node highlight" style="justify-content:center; margin-bottom:6px;">VM-2: Agent + Web Server</div>
+        <div style="font-size:9px; color:var(--text3)">Apache + ModSecurity<br>Wazuh Agent</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="arch-node" style="justify-content:center; margin-bottom:6px;">VM-3: Attacker</div>
+        <div style="font-size:9px; color:var(--text3)">Kali Linux<br>Simulated threats</div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:12px; font-size:9px; color:var(--text3); border-top:1px solid var(--border); padding-top:10px;">
+      All VMs on isolated internal network · Host-only adapter for management access
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:2rem;"><div class="section-title">Detection Rules (MITRE Mapped)</div><div class="section-line"></div></div>
+  <div class="alert-feed">
+    <div class="alert-row">
+      <span class="alert-sev sev-high">HIGH</span>
+      <span class="alert-rule">Brute Force SSH — T1110.001</span>
+      <span style="font-size:10px; color:var(--text2)">5+ failed logins in 60s → alert</span>
+      <span class="alert-time">rule_id: 5712</span>
+    </div>
+    <div class="alert-row">
+      <span class="alert-sev sev-high">HIGH</span>
+      <span class="alert-rule">Exploitation Attempt — T1190</span>
+      <span style="font-size:10px; color:var(--text2)">ModSecurity WAF block logged</span>
+      <span class="alert-time">rule_id: 31151</span>
+    </div>
+    <div class="alert-row">
+      <span class="alert-sev sev-med">MED</span>
+      <span class="alert-rule">OS Command Injection</span>
+      <span style="font-size:10px; color:var(--text2)">POST body inspection via ModSec</span>
+      <span class="alert-time">rule_id: 932100</span>
+    </div>
+    <div class="alert-row">
+      <span class="alert-sev sev-low">LOW</span>
+      <span class="alert-rule">Recon Port Scan Detected</span>
+      <span style="font-size:10px; color:var(--text2)">Nmap SYN scan from VM-3</span>
+      <span class="alert-time">rule_id: 40101</span>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:2rem;"><div class="section-title">Key Finding: ModSecurity Gap Fix</div><div class="section-line"></div></div>
+  <div style="background:var(--bg2); border:1px solid rgba(248,81,73,0.2); border-left: 3px solid var(--danger); border-radius:8px; padding:1.25rem; font-size:12px; color:var(--text2); line-height:2;">
+    <strong style="color:var(--danger)">Problem:</strong> Apache's default logging config omitted POST body content. Attackers sending SQLi/RCE payloads via POST were invisible in standard access logs.<br>
+    <strong style="color:var(--accent2)">Fix:</strong> Deployed ModSecurity with <code style="color:var(--accent3)">SecRequestBodyAccess On</code> and custom Wazuh decoder to parse ModSec audit log format into structured alerts.
+  </div>
+
+  <div class="code-block" style="margin-top:1rem;">
+    <div class="code-block-header"><span class="code-dot" style="background:#ff5f56"></span><span class="code-dot" style="background:#ffbd2e"></span><span class="code-dot" style="background:#27c93f"></span>&nbsp; custom_wazuh_rule.xml</div>
+    <pre><span class="code-comment">&lt;!-- Custom rule: SSH Brute Force → T1110.001 --&gt;</span>
+<span class="code-keyword">&lt;rule id=</span><span class="code-string">"100001"</span><span class="code-keyword"> level=</span><span class="code-string">"10"</span><span class="code-keyword"> frequency=</span><span class="code-string">"5"</span><span class="code-keyword"> timeframe=</span><span class="code-string">"60"</span><span class="code-keyword">&gt;</span>
+  &lt;if_matched_sid&gt;5716&lt;/if_matched_sid&gt;
+  &lt;description&gt;SSH Brute Force: T1110.001&lt;/description&gt;
+  &lt;mitre&gt;
+    &lt;id&gt;T1110.001&lt;/id&gt;
+  &lt;/mitre&gt;
+  &lt;group&gt;authentication_failures,pci_dss_10.2.4&lt;/group&gt;
+<span class="code-keyword">&lt;/rule&gt;</span></pre>
+  </div>
+  <div style="margin-top:1.5rem; display:flex; gap:12px;">
+    <a href="https://medium.com/@lokeshacharya/building-a-home-soc-lab-with-wazuh-c088af84ac95" target="_blank" rel="noopener noreferrer"><button class="btn btn-primary">Read Full Writeup</button></a>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<div id="page-skills" class="page">
+  <div style="padding:2.5rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem;">
+    <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:12px;">SKILLS // CAPABILITY MAP</div>
+    <div style="font-family:var(--display); font-size:32px; font-weight:800; color:var(--text);">Technical Skills</div>
+  </div>
+  <div class="skills-grid" id="skills-grid">
+    <div class="skill-group">
+      <div class="skill-group-title">Blue Team</div>
+      <div class="skill-row"><div class="skill-name"><span>SIEM Monitoring</span><span style="color:var(--accent3)">85%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="85" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Log Analysis</span><span style="color:var(--accent3)">80%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="80" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Threat Detection</span><span style="color:var(--accent3)">75%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="75" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Incident Response</span><span style="color:var(--accent3)">70%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="70" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Detection Engineering</span><span style="color:var(--accent3)">72%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="72" style="width:0%"></div></div></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Tools & Platforms</div>
+      <div class="skill-row"><div class="skill-name"><span>Wazuh SIEM</span><span style="color:var(--accent2)">82%</span></div><div class="skill-bar"><div class="skill-fill green" data-w="82" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Wireshark</span><span style="color:var(--accent2)">75%</span></div><div class="skill-bar"><div class="skill-fill green" data-w="75" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Nmap / Nessus</span><span style="color:var(--accent2)">70%</span></div><div class="skill-bar"><div class="skill-fill green" data-w="70" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Burp Suite</span><span style="color:var(--accent2)">65%</span></div><div class="skill-bar"><div class="skill-fill green" data-w="65" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Splunk (SPL)</span><span style="color:var(--accent2)">60%</span></div><div class="skill-bar"><div class="skill-fill green" data-w="60" style="width:0%"></div></div></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Programming</div>
+      <div class="skill-row"><div class="skill-name"><span>Python</span><span style="color:var(--warn)">75%</span></div><div class="skill-bar"><div class="skill-fill amber" data-w="75" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Bash / Shell</span><span style="color:var(--warn)">70%</span></div><div class="skill-bar"><div class="skill-fill amber" data-w="70" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>C (Systems)</span><span style="color:var(--warn)">50%</span></div><div class="skill-bar"><div class="skill-fill amber" data-w="50" style="width:0%"></div></div></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Concepts</div>
+      <div class="skill-row"><div class="skill-name"><span>MITRE ATT&CK</span><span style="color:var(--accent3)">80%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="80" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Network Security</span><span style="color:var(--accent3)">75%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="75" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Log Correlation</span><span style="color:var(--accent3)">72%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="72" style="width:0%"></div></div></div>
+      <div class="skill-row"><div class="skill-name"><span>Vulnerability Research</span><span style="color:var(--accent3)">65%</span></div><div class="skill-bar"><div class="skill-fill blue" data-w="65" style="width:0%"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WRITEUPS -->
+<div id="page-writeups" class="page">
+  <div style="padding:2.5rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem;">
+    <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:12px;">WRITEUPS // BLOG</div>
+    <div style="font-family:var(--display); font-size:32px; font-weight:800; color:var(--text);">Technical Writing</div>
+    <div style="font-size:12px; color:var(--text2); margin-top:8px;">Published on <a href="https://medium.com/@lokeshacharya" target="_blank" rel="noopener noreferrer" style="color:var(--accent3); text-decoration:none;">medium.com/@lokeshacharya</a></div>
+  </div>
+  <div class="writeup-card" onclick="window.open('https://medium.com/@lokeshacharya/building-a-home-soc-lab-with-wazuh-c088af84ac95','_blank','noopener,noreferrer')">
+    <div class="writeup-num">01</div>
+    <div>
+      <div class="writeup-title">Building a Home SOC Lab with Wazuh</div>
+      <div class="writeup-meta">PUBLISHED ON MEDIUM · SIEM · DETECTION ENGINEERING</div>
+      <div class="writeup-excerpt">A full walkthrough of setting up a 3-VM home SOC lab with Wazuh SIEM. Covers installation, agent enrollment, custom rule creation mapped to MITRE ATT&CK, and the ModSecurity WAF integration that fixed a critical Apache logging gap for POST body visibility.</div>
+    </div>
+  </div>
+  <div class="writeup-card" style="opacity:0.6; cursor:default;">
+    <div class="writeup-num">02</div>
+    <div>
+      <div class="writeup-title">Active Directory Attack & Detection Lab</div>
+      <div class="writeup-meta">IN PROGRESS · ACTIVE DIRECTORY · THREAT HUNTING</div>
+      <div class="writeup-excerpt">Documenting a full AD lab: domain controller setup, Kerberoasting and Pass-the-Hash with Impacket/CrackMapExec, detection via Wazuh using Windows Event IDs 4625, 4769, 4768, 4624+4672, and BloodHound visualization.</div>
+      <div style="margin-top:8px; font-size:9px; color:var(--warn); letter-spacing:1px;">COMING SOON</div>
+    </div>
+  </div>
+  <div class="writeup-card" style="opacity:0.6; cursor:default;">
+    <div class="writeup-num">03</div>
+    <div>
+      <div class="writeup-title">CTF Writeup: Heap Exploitation — lulocator</div>
+      <div class="writeup-meta">IN PROGRESS · PWN · BINARY EXPLOITATION</div>
+      <div class="writeup-excerpt">Detailed analysis of a custom allocator heap overflow challenge. Covers safe-unlink bypass using a global RUNNER pointer and one_gadget chaining for code execution.</div>
+      <div style="margin-top:8px; font-size:9px; color:var(--warn); letter-spacing:1px;">COMING SOON</div>
+    </div>
+  </div>
+</div>
+
+<!-- CERTS -->
+<div id="page-certs" class="page">
+  <div style="padding:2.5rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem;">
+    <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:12px;">CERTIFICATIONS // CREDENTIALS</div>
+    <div style="font-family:var(--display); font-size:32px; font-weight:800; color:var(--text);">Proof of Learning</div>
+  </div>
+  <div class="cert-grid">
+    <div class="cert-card">
+      <div class="cert-icon thm">◈</div>
+      <div>
+        <div class="cert-title">TryHackMe — 110+ Rooms</div>
+        <div class="cert-issuer">Handle: 0xInverto · Active Learner</div>
+        <div class="cert-badge">ACTIVE</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon cisco">⬡</div>
+      <div>
+        <div class="cert-title">Networking Basics</div>
+        <div class="cert-issuer">Cisco Networking Academy</div>
+        <div class="cert-badge">CERTIFIED</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon cisco">⬡</div>
+      <div>
+        <div class="cert-title">Introduction to Cybersecurity</div>
+        <div class="cert-issuer">Cisco Networking Academy</div>
+        <div class="cert-badge">CERTIFIED</div>
+      </div>
+    </div>
+    <div class="cert-card" style="opacity:0.5;">
+      <div class="cert-icon" style="background:var(--bg4);">+</div>
+      <div>
+        <div class="cert-title">More Coming...</div>
+        <div class="cert-issuer">Actively studying for next cert</div>
+        <div style="font-size:9px; color:var(--warn); margin-top:6px; letter-spacing:1px;">IN PROGRESS</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:2.5rem;">
+    <div class="section-title">TryHackMe Progress</div><div class="section-line"></div>
+  </div>
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.5rem;">
+    <div style="display:flex; gap:2rem; flex-wrap:wrap;">
+      <div><div style="font-size:10px; color:var(--text3); margin-bottom:4px; letter-spacing:1px; text-transform:uppercase;">Handle</div><div style="color:var(--accent3)">0xInverto</div></div>
+      <div><div style="font-size:10px; color:var(--text3); margin-bottom:4px; letter-spacing:1px; text-transform:uppercase;">Rooms Completed</div><div style="color:var(--text)">110+</div></div>
+      <div><div style="font-size:10px; color:var(--text3); margin-bottom:4px; letter-spacing:1px; text-transform:uppercase;">Focus Areas</div><div style="color:var(--text)">SOC · Blue Team · Web Exploitation</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="page-about" class="page">
+  <div style="padding:2.5rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem;">
+    <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:12px;">ABOUT // IDENTITY</div>
+    <div style="font-family:var(--display); font-size:32px; font-weight:800; color:var(--text);">Lokesh Acharya</div>
+    <div style="font-size:12px; color:var(--text2); margin-top:6px;">BSc (Hons) Ethical Hacking & Cybersecurity · Softwarica College / Coventry University · Nepal</div>
+  </div>
+  <div class="about-grid">
+    <div class="about-block">
+      <div class="about-label">Current Status</div>
+      <div class="about-text">
+        5th-semester student at <strong>Softwarica College of IT & E-commerce</strong>, affiliated with Coventry University. Building hands-on skills through real lab environments, CTF competitions, and bug bounty hunting — not just coursework.
+      </div>
+    </div>
+    <div class="about-block">
+      <div class="about-label">Focus Area</div>
+      <div class="about-text">
+        <strong>Blue Team</strong> and <strong>SOC operations</strong>. Specifically interested in <strong>detection engineering</strong> — writing rules that actually catch things, not just checking compliance boxes. MITRE ATT&CK mapping is central to how I think about coverage.
+      </div>
+    </div>
+    <div class="about-block">
+      <div class="about-label">Currently Learning</div>
+      <div class="about-text">
+        Active Directory attack paths and detection via Wazuh + Windows Event IDs. Splunk SPL for log querying. Python automation for security tooling. Bug bounty recon methodology with Go-based toolchains.
+      </div>
+    </div>
+    <div class="about-block">
+      <div class="about-label">Career Goal</div>
+      <div class="about-text">
+        Entry-level <strong>SOC Analyst</strong> or <strong>Detection Engineer</strong> role. The gap I'm trying to close: not just knowing that Kerberoasting exists, but being the person who writes the detection rule for it.
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.5rem;">
+    <div style="font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px;">Why Blue Team?</div>
+    <div style="font-size:12px; color:var(--text2); line-height:2; max-width:600px;">
+      Offense helps you understand what's possible. Defense is where you actually stop it. I'm drawn to the analytical side — reading logs, understanding attacker patterns, building detections that hold up against real TTPs. A SOC isn't about reacting fast; it's about having built the right visibility before the incident happens.
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div id="page-contact" class="page">
+  <div style="padding:2.5rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem;">
+    <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:12px;">CONTACT // REACH OUT</div>
+    <div style="font-family:var(--display); font-size:32px; font-weight:800; color:var(--text);">Get in Touch</div>
+    <div style="font-size:12px; color:var(--text2); margin-top:6px;">Open to SOC analyst internships, blue team roles, and security research collaborations.</div>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-form">
+      <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:1rem;">Send a Message</div>
+      <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" placeholder="Your name" id="cf-name" autocomplete="off"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="your@email.com" id="cf-email" autocomplete="off"></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" placeholder="Your message..." id="cf-msg"></textarea></div>
+      <button class="btn btn-primary" onclick="submitForm()" style="width:100%">Send Message</button>
+      <div id="form-status" style="margin-top:8px; font-size:11px; color:var(--accent2); display:none;">✓ Message ready — connect your backend or email provider</div>
+    </div>
+    <div class="contact-links">
+      <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:1rem;">Direct Links</div>
+      <a class="contact-link-row" href="https://github.com/LokeshAcharya" target="_blank" rel="noopener noreferrer">
+        <div class="clink-icon">⌥</div>
+        <div><div class="clink-label">GitHub</div><div class="clink-val">github.com/LokeshAcharya</div></div>
+      </a>
+      <a class="contact-link-row" href="https://medium.com/@lokeshacharya" target="_blank" rel="noopener noreferrer">
+        <div class="clink-icon">✍</div>
+        <div><div class="clink-label">Medium Blog</div><div class="clink-val">@lokeshacharya</div></div>
+      </a>
+      <a class="contact-link-row" href="https://tryhackme.com/p/0xInverto" target="_blank" rel="noopener noreferrer">
+        <div class="clink-icon">◈</div>
+        <div><div class="clink-label">TryHackMe</div><div class="clink-val">0xInverto</div></div>
+      </a>
+      <div class="contact-link-row" style="cursor:default; opacity:0.6;">
+        <div class="clink-icon">in</div>
+        <div><div class="clink-label">LinkedIn</div><div class="clink-val">Add your LinkedIn URL</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  var p = document.getElementById('page-' + id);
+  if (p) { p.classList.add('active'); window.scrollTo(0,0); }
+  document.querySelectorAll('.nav-link').forEach(l => { if (l.textContent.toLowerCase().trim() === id.toLowerCase()) l.classList.add('active'); });
+  if (id === 'skills') setTimeout(animateBars, 100);
+}
+
+function showProjectDetail(slug) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  var p = document.getElementById('page-detail-' + slug);
+  if (p) { p.classList.add('active'); window.scrollTo(0,0); }
+}
+
+function animateBars() {
+  document.querySelectorAll('.skill-fill').forEach(function(el) {
+    el.style.width = (el.getAttribute('data-w') || 0) + '%';
+  });
+}
+
+function submitForm() {
+  var n = document.getElementById('cf-name').value.trim();
+  var e = document.getElementById('cf-email').value.trim();
+  var m = document.getElementById('cf-msg').value.trim();
+  if (!n || !e || !m) return;
+  document.getElementById('form-status').style.display = 'block';
+}
+
+var logs = [
+  {t:'info', m:'[2025-05-06 09:41:02] INFO  Wazuh agent heartbeat received from 192.168.1.102'},
+  {t:'ok',   m:'[2025-05-06 09:41:15] OK    No critical alerts in last 15 minutes'},
+  {t:'warn', m:'[2025-05-06 09:42:07] WARN  Failed SSH login attempt from 10.0.0.44 (attempt 3/5)'},
+  {t:'dim',  m:'[2025-05-06 09:42:31] INFO  ModSecurity: Request inspected, no anomalies (rule CRS 3.3.4)'},
+  {t:'alert',m:'[2025-05-06 09:43:18] ALERT Brute force threshold reached — T1110.001 triggered'},
+  {t:'ok',   m:'[2025-05-06 09:43:19] OK    Alert forwarded to Wazuh dashboard'},
+  {t:'dim',  m:'[2025-05-06 09:44:01] INFO  Network scan detected from 192.168.1.200 (Nmap SYN)'},
+  {t:'warn', m:'[2025-05-06 09:44:22] WARN  Unusual outbound connection on port 4444 — reviewing'},
+  {t:'info', m:'[2025-05-06 09:45:00] INFO  Daily log rotation completed — 847 events archived'},
+  {t:'ok',   m:'[2025-05-06 09:45:30] OK    Honeypot listener active on ports 22, 80, 443, 3306'},
+];
+var logIdx = 0;
+function addLog() {
+  var c = document.getElementById('log-container');
+  if (!c) return;
+  var l = logs[logIdx % logs.length];
+  var d = document.createElement('div');
+  d.className = 'log-entry ' + l.t;
+  d.textContent = l.m;
+  c.insertBefore(d, c.firstChild);
+  if (c.children.length > 5) c.removeChild(c.lastChild);
+  logIdx++;
+}
+for (var i = 0; i < 5; i++) addLog();
+setInterval(addLog, 2800);
+</script>
